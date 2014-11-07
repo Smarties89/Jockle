@@ -1,0 +1,125 @@
+<!DOCTYPE html
+ PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <!--
+
+-->
+<html>
+
+ <head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+ </head>
+
+ <body>
+
+ 	<div class="container">
+		<h1>API with the possibilty of changing</h1><br/><br/>
+
+		<div class="row"> 
+			<div class="form-group">
+				<div class="col-xs-5">
+					<h3>Url</h3>
+				</div>
+				<div class="col-xs-1">
+					<h3>Method</h3>
+				</div>
+				<div class="col-xs-1">
+					<h3>Type</h3>
+				</div>
+				<div class="col-xs-1">
+					<h3>Link</h3>
+				</div>
+				<div class="col-xs-3">
+					<h3>Data</h3>
+				</div>
+				<div class="col-xs-1">
+					<h3>Save</h3>
+				</div>
+			</div>
+		</div>
+
+		{% for api in apis %}
+		<div class="row"> 
+			<form action="/update" method="POST">
+			<div class="form-group">
+				<input type="hidden" name="opath" value="{{ api['url']+"."+api['method']+"."+api['type'] }}" />
+				<div class="col-xs-5">
+					<input class="form-control" type="text" name="url" value="{{ api['url'] }}"/>
+				</div>
+				<div class="col-xs-1">
+					<select class="form-control" name="method">
+						<option value="GET">GET</option>
+						<option value="POST">POST</option>
+						<option value="PUT">PUT</option>
+						<option value="DELETE">DELETE</option>
+					</select>
+				</div>
+				<div class="col-xs-1">
+
+					<input class="form-control" type="text" name="type" value="{{ api['type'] }}"/>
+				</div>
+				<div class="col-xs-1">
+					<a href="{{ api['url'] }}"> link</a>
+				</div>
+				<div class="col-xs-3">
+					<input class="form-control" type="text" name="data" value="{{ api['data']|e }}"/>
+				</div>
+				<div class="col-xs-1">
+					<input class="form-submit" type="submit"  value="Save"/>
+				</div>
+			</div>
+			</form>
+		</div>
+		{% endfor %}
+
+
+		<div class="row">
+		<form action="/insert" method="POST">
+			<div class="form-group">
+				<div class="col-xs-5">
+					<input class="form-control" type="text" name="url"/>
+				</div>
+				<div class="col-xs-1">
+
+					<select class="form-control" name="method">
+						<option value="GET">GET</option>
+						<option value="POST">POST</option>
+						<option value="PUT">PUT</option>
+						<option value="DELETE">DELETE</option>
+					</select>
+				</div>
+				<div class="col-xs-1">
+					<input class="form-control" type="text" name="type"/>
+				</div>
+				<div class="col-xs-1">
+					
+				</div>
+				<div class="col-xs-3">
+					<input class="form-control" type="text" name="data"/>
+				</div>
+
+
+				<div class="col-xs-1">
+					<input class="form-submit" type="submit"  value="Insert"/>
+				</div>
+			</div>
+		</form>
+		</div>
+
+
+
+	</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+ </body>
+</html>
