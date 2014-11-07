@@ -9,6 +9,6 @@ def task_aptinstaller():
 
 def task_rundebugmode():
     return {
-        "actions": ["python main.py dummytestdata 5000", ],
+        "actions": ["python main.py dummytestdata.db 5000", ],
         "verbosity": 2
     }
