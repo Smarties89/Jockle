@@ -12,6 +12,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 		<!--[if lt IE 9]>
@@ -19,6 +21,22 @@
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
  </head>
+
+ <script>
+$(document).ready(function() {
+	$('textarea.expand').focus(function () {
+		$(this).animate({ height: "10em" }, 500); 
+	 });
+})
+ </script>
+
+ <style>
+.expand {
+	height: 1em;
+	width: 50%;
+	padding: 3px;
+}
+ </style>
 
  <body>
 
@@ -72,7 +90,7 @@
 					<a href="{{ api['url'] }}"> link</a>
 				</div>
 				<div class="col-xs-3">
-					<input class="form-control" type="text" name="data" value="{{ api['data']|e }}"/>
+					<textarea class="form-control expand" rows="1" name="data" cols="10">{{ api['data']|e }}</textarea>
 				</div>
 				<div class="col-xs-1">
 					<input class="form-submit" type="submit"  value="Save"/>
@@ -105,7 +123,7 @@
 					
 				</div>
 				<div class="col-xs-3">
-					<input class="form-control" type="text" name="data"/>
+					<textarea class="form-control expand" rows="1" name="data" cols="10"></textarea>
 				</div>
 
 
@@ -119,7 +137,6 @@
 
 
 	</div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
  </body>
 </html>
