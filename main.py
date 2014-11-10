@@ -3,18 +3,15 @@
 # Standard libraries
 import logging
 from sys import argv
-from os import listdir
-from os.path import join as joinpath
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
-from time import sleep
-from os import rename
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from uuid import uuid1
 import re
 import shelve
+
 
 from jinja2 import Environment, FileSystemLoader
 from cgi import parse_header, parse_multipart
 from urlparse import parse_qs
-
 
 
 log = logging.getLogger()
@@ -23,13 +20,16 @@ port = int(argv[2])
 
 env = Environment(loader=FileSystemLoader('templates'))
 
+
 def render_template(templatefile, **kwargs):
     template = env.get_template(templatefile)
     return template.render(**kwargs)
 
+
 def debug():
     # TODO: implementer
     return True
+
 
 if debug():
     logging.basicConfig()
@@ -37,6 +37,7 @@ if debug():
 else:
     logging.basicConfig()
     log.setLevel(logging.INFO)
+
 
 class RouteDatabaseShelve:
     def __init__(self, fn):
@@ -49,7 +50,6 @@ class RouteDatabaseShelve:
             self.l = s['l']
         s.close()
 
-
     def searchurlpattern(self, url, method):
         i = filter(lambda o: o['pattern'].match(url) is not None, self.l)
         log.debug(i)
@@ -58,36 +58,11 @@ class RouteDatabaseShelve:
         else:
             return None
 
-
-    def insertroute(self, url, method, type, data):
-        self.l.append(
-            {
-                "url": url,
-                "method": method,
-                "type": type,
-                "data": data,
-                "pattern": re.compile(url)
-            })
-
+    def __savestate(self):
         f = shelve.open(self.fn)
         f['l'] = self.l
         f.close()
 
-    def listpaths(self):
-        return self.l
-
-
-class RouteDatabaseInMemory:
-    def __init__(self):
-        self.l = []
-
-
-    def searchurlpattern(self, url, method):
-        i = filter(lambda o: o['pattern'].match(url) is not None, self.l)
-        log.debug(i)
-        return i[0]
-
-
     def insertroute(self, url, method, type, data):
         self.l.append(
             {
@@ -95,21 +70,61 @@ class RouteDatabaseInMemory:
                 "method": method,
                 "type": type,
                 "data": data,
-                "pattern": re.compile(url)
+                "pattern": re.compile(_converttoregex(url)),
+                "id": str(uuid1())
             })
+        self.__savestate()
+
     def listpaths(self):
         return self.l
+
+    def update(self, id, url, method, type, data):
+        i = filter(lambda o: o['id'] == id, self.l)
+
+        i[0]['url'] = url
+        i[0]['method'] = method
+        i[0]['type'] = type
+        i[0]['data'] = data
+        i[0]['pattern'] = re.compile(_converttoregex(url))
+
+        self.__savestate()
+
+
+def _scanvar(pattern):
+    i = 1
+    while len(pattern) > i and pattern[i] != ">":
+        i += 1
+    if pattern[i] != ">":
+        print(i)
+        return None, i
+
+    var = pattern[1:i]
+    log.debug("var found: {}".format(var))
+    return pattern[0:i], i
+
+
+def _converttoregex(pattern):
+    i = 0
+    result = ""
+    while i < len(pattern):
+        if pattern[i] == "<":
+            var, newi = _scanvar(pattern[i:])
+            if var is None:
+                print("error parsing variable")
+            i = newi + i
+            result += "\w*"
+        else:
+            result += pattern[i]
+        i = i + 1
+
+    return result
 
 
 db = RouteDatabaseShelve(dbpath)
 #db.insertroute("/cards/[\w]*/categories", "POST", "json", '{"status": "hi"}')
 
-class MBaseRequestHandler(BaseHTTPRequestHandler):
-    def index(self):
-        log.debug("Index requested")
-        apis = listdummydir(dummypath, [])
-        return self.ret(render_template("index.html", apis=apis), "text/html")
 
+class MBaseRequestHandler(BaseHTTPRequestHandler):
     def ret(self, text, type):
         self.send_response(200)
         self.send_header('Content-type', type)
@@ -126,7 +141,7 @@ class MBaseRequestHandler(BaseHTTPRequestHandler):
         res, type = self.post(self.path, vars)
 
         self.ret(res, type)
-    
+
     def parse_POST(self):
         ctype, pdict = parse_header(self.headers['content-type'])
         if ctype == 'multipart/form-data':
@@ -134,7 +149,7 @@ class MBaseRequestHandler(BaseHTTPRequestHandler):
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])
             postvars = parse_qs(
-                self.rfile.read(length), 
+                self.rfile.read(length),
                 keep_blank_values=1)
         else:
             postvars = {}
@@ -149,20 +164,19 @@ class DummyHandler(MBaseRequestHandler):
         elif url == "/insert":
             self.insert(vars)
             return self.index()
-        
+
         data = db.searchurlpattern(self.path, "POST")
-        
+
         if data is None:
             return "Doesn't exists!", "text/html"
 
         return data['data'], "application/json"
 
-
     def get(self, url, vars):
         if url == "/":
             return self.index()
         data = db.searchurlpattern(self.path, "GET")
-        
+
         if data is None:
             return "Doesn't exists!", "text/html"
 
@@ -175,7 +189,7 @@ class DummyHandler(MBaseRequestHandler):
         type = vars['type'][0]
         data = vars['data'][0]
         db.insertroute(url, method, type, data)
-    
+
     def index(self):
         log.debug("Index requested")
 
@@ -183,14 +197,15 @@ class DummyHandler(MBaseRequestHandler):
 
         return render_template("index.html", apis=apis), "text/html"
 
-    def update(self, url, wars):
-        oldpath = dummypath + vars['opath'][0]
-        newname = dummypath + vars['url'][0] + "." + vars['method'][0] + "." + vars['type'][0]
-        log.debug("Renaming {} to {}".format(oldpath, newname))
-
-        db.rename(oldpath, newname)
+    def update(self, url, vars):
+        log.debug(vars)
+        db.update(
+            vars['id'][0],
+            vars['url'][0],
+            vars['method'][0],
+            vars['type'][0],
+            vars['data'][0])
         return self.index()
-
 
 
 def main():

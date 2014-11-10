@@ -70,7 +70,7 @@ $(document).ready(function() {
 		<div class="row"> 
 			<form action="/update" method="POST">
 			<div class="form-group">
-				<input type="hidden" name="opath" value="{{ api['url']+"."+api['method']+"."+api['type'] }}" />
+				<input type="hidden" name="id" value="{{ api['id'] }}" />
 				<div class="col-xs-5">
 					<input class="form-control" type="text" name="url" value="{{ api['url'] }}"/>
 				</div>
