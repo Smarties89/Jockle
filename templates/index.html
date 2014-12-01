@@ -43,7 +43,7 @@ $(document).ready(function() {
  	<div class="container">
 		<h1>API with the possibilty of changing</h1><br/><br/>
 
-		<div class="row"> 
+<!--		<div class="row"> 
 			<div class="form-group">
 				<div class="col-xs-5">
 					<h3>Url</h3>
@@ -65,76 +65,148 @@ $(document).ready(function() {
 				</div>
 			</div>
 		</div>
-
+-->
 		{% for api in apis %}
-		<div class="row"> 
-			<form action="/update" method="POST">
-			<div class="form-group">
-				<input type="hidden" name="id" value="{{ api['id'] }}" />
-				<div class="col-xs-5">
-					<input class="form-control" type="text" name="url" value="{{ api['url'] }}"/>
-				</div>
-				<div class="col-xs-1">
-					<select class="form-control" name="method">
-						<option value="GET">GET</option>
-						<option value="POST">POST</option>
-						<option value="PUT">PUT</option>
-						<option value="DELETE">DELETE</option>
-					</select>
-				</div>
-				<div class="col-xs-1">
+		<hr/>
+		<form action="/updatejockle" method="POST">
+			<div class="row"> 
+				<div class="form-group">
+					<input type="hidden" name="id" value="{{ api['id'] }}" />
+					<div class="col-xs-5">
+						<input class="form-control" type="text" name="url" value="{{ api['url'] }}"/>
+					</div>
+					<div class="col-xs-1">
+						<select class="form-control" name="method">
+							<option value="GET">GET</option>
+							<option value="POST">POST</option>
+							<option value="PUT">PUT</option>
+							<option value="DELETE">DELETE</option>
+						</select>
+					</div>
+					<div class="col-xs-3">
+						<select class="form-control" name="type" value="{{ api['type'] }}">
+							{% for mime in mimes %}
+								{% if mime == api['type'] %}
+									<option value="{{mime}}" selected="selected">{{mime}}</option>
+								{% else %}
+									<option value="{{mime}}">{{mime}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+					
+					<div class="col-xs-2">
+						<select class="form-control" name="returncode">	
+						{% for statuscode in statuscodes %}
+							{% if statuscode[0] == 200 %}
+								<option value="{{ statuscode[0] }}" selected>{{ statuscode[1] }}({{ statuscode[0] }})</option>
+							{% else %}
+								<option value="{{ statuscode[0] }}">{{ statuscode[1] }}({{ statuscode[0] }})</option>
+							{% endif %}
+						{% endfor %}
+						</select>
+					</div>
 
-					<input class="form-control" type="text" name="type" value="{{ api['type'] }}"/>
-				</div>
-				<div class="col-xs-1">
-					<a href="{{ api['url'] }}"> link</a>
-				</div>
-				<div class="col-xs-3">
-					<textarea class="form-control expand" rows="1" name="data" cols="10">{{ api['data']|e }}</textarea>
-				</div>
-				<div class="col-xs-1">
-					<input class="form-submit" type="submit"  value="Save"/>
+					<div class="col-xs-1">
+						<a href="{{ api['url'] }}"> link</a>
+					</div>
 				</div>
 			</div>
-			</form>
-		</div>
-		{% endfor %}
+			<br/>
+			<div class="row"> 
+				<div class="form-group">
 
-
-		<div class="row">
-		<form action="/insert" method="POST">
-			<div class="form-group">
-				<div class="col-xs-5">
-					<input class="form-control" type="text" name="url"/>
-				</div>
-				<div class="col-xs-1">
-
-					<select class="form-control" name="method">
-						<option value="GET">GET</option>
-						<option value="POST">POST</option>
-						<option value="PUT">PUT</option>
-						<option value="DELETE">DELETE</option>
-					</select>
-				</div>
-				<div class="col-xs-1">
-					<input class="form-control" type="text" name="type"/>
-				</div>
-				<div class="col-xs-1">
+					<div class="col-xs-3">
+						<p><b> Return</b></p>
+						<textarea class="form-control expand" rows="1" name="returndata" cols="10">{{ api['data']|e }}</textarea>
+					</div>
 					
-				</div>
-				<div class="col-xs-3">
-					<textarea class="form-control expand" rows="1" name="data" cols="10"></textarea>
-				</div>
+					<div class="col-xs-4">
+						<p><b> Input arguments(JSON)</b></p>
+						{% for arg in api['args'] %}
+							<input class="form-control" type="text" name="args" value="{{ arg[0] }}"/>
+						{% endfor %}
+					</div>
 
 
-				<div class="col-xs-1">
-					<input class="form-submit" type="submit"  value="Insert"/>
+					<div class="col-xs-offset-4 col-xs-1">
+						<br/><br/>
+						<input class="form-submit" type="submit"  value="Save"/>
+					</div>
+
 				</div>
 			</div>
 		</form>
+		{% endfor %}
+
+
+
+		<br/>
+		<br/>
+		<hr/>
+		<hr/>
+		<div class="row">
+			<div class="col-xs-5">
+				<h2> Insert new api </h2>
+			</div>
 		</div>
+		<form action="/insertjockle" method="POST">
+			<div class="row"> 
+				<div class="form-group">
+					<div class="col-xs-5">
+						<input class="form-control" type="text" name="url"/>
+					</div>
+					<div class="col-xs-2">
+						<select class="form-control" name="method">
+							<option value="GET">GET</option>
+							<option value="POST">POST</option>
+							<option value="PUT">PUT</option>
+							<option value="DELETE">DELETE</option>
+						</select>
+					</div>
+					<div class="col-xs-3">
+						<select class="form-control" name="type" value="">
+							{% for mime in mimes %}
+								{% if mime == "application/json" %}
+									<option value="{{mime}}" selected="selected">{{mime}}</option>
+								{% else %}
+									<option value="{{mime}}">{{mime}}</option>
+								{% endif %}
+							{% endfor %}
+						</select>
+					</div>
+					<div class="col-xs-2">
+						<select class="form-control" name="returncode">	
+						{% for statuscode in statuscodes %}
+							{% if statuscode[0] == 200 %}
+								<option value="{{ statuscode[0] }}" selected>{{ statuscode[1] }}({{ statuscode[0] }})</option>
+							{% else %}
+								<option value="{{ statuscode[0] }}">{{ statuscode[1] }}({{ statuscode[0] }})</option>
+							{% endif %}
+						{% endfor %}
+						</select>
+					</div>
+
+				</div>
+			</div>
+			<br/>
+			<div class="row"> 
+				<div class="form-group">
+
+					<div class="col-xs-3">
+						<p><b> Return</b></p>
+						<textarea class="form-control expand" rows="1" name="returndata" cols="10"></textarea>
+					</div>
 
 
+					<div class="col-xs-offset-8 col-xs-1">
+						<br/><br/>
+						<input class="form-submit" type="submit"  value="Insert"/>
+					</div>
+
+				</div>
+			</div>
+		</form>
 
 	</div>
 
