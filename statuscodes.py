@@ -420,6 +420,6 @@ statuscodes = [
     (496, "Unassigned"),
     (497, "Unassigned"),
     (498, "Unassigned"),
-    (499, "Unassigned")
-    (509, "Unassigned"),
+    (499, "Unassigned"),
+    (509, "Unassigned")
 ]
