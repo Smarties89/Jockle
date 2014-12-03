@@ -43,11 +43,15 @@ def not_found(error=None):
 
 def addapi(api):
     log.info("Adding '{}' as api".format(api['url']))
-    app.add_url_rule(
-        api['url'], # path
-        api['url'], # name
-        lambda: api['returndata'],
-        methods=[api['method']])
+    try:
+        app.add_url_rule(
+            api['url'], # path
+            api['url'], # name
+            lambda: api['returndata'],
+            methods=[api['method']])
+    except Exception as e:
+        log.warning("{} could not be added. Properly because it was a malformed url or already exists. Exception: {}".
+            format(api['url'], e))
         
 
 
