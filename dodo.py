@@ -1,9 +1,9 @@
 #!/bin/python
 import os
-def task_aptinstaller():
+def task_depedencyinstaller():
     return {
-        'actions': ["bash aptinstalls"],
-        'file_dep': ["aptinstalls"],
+        'actions': ["bash installs"],
+        'file_dep': ["installs"],
         'verbosity': 2
     }
 
