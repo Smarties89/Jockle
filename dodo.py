@@ -7,7 +7,7 @@ def task_depedencyinstaller():
         'verbosity': 2
     }
 
-def task_rundebugmode():
+def task_rundebug():
     return {
         "actions": ["python jockle.py dummytestdata.db 5000", ],
         "verbosity": 2
