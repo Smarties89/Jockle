@@ -94,7 +94,7 @@ def main():
     for api in db.listpaths():
         addapi(api)
     app.debug = True
-    app.run(host="0.0.0.0", port=port, extra_files=["dummytestdata.db"])
+    app.run(host="0.0.0.0", port=port, extra_files=[dbpath])
 
 
 if __name__ == "__main__":
