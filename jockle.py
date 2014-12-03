@@ -3,13 +3,17 @@
 # Standard libraries
 import logging
 from sys import argv
+from urlparse import urljoin
 
 from flask import render_template, Flask, request, redirect, jsonify, Response
 from fest.decorators import requireformdata
+from flask import stream_with_context
+import requests
 
 from statuscodes import statuscodes
 from mimes import mimes
 from dbs import RouteDatabaseShelve 
+
 
 log = logging.getLogger()
 app = Flask(__name__)
@@ -27,18 +31,25 @@ else:
     logging.basicConfig()
     log.setLevel(logging.INFO)
 
-
+# This is handling the proxy functionality.
+# Thanks to Zeray Rice for the stream proxy,
+# see more here: http://flask.pocoo.org/snippets/118/
 @app.errorhandler(404)
 def not_found(error=None):
-
-    message = {
-        'status': 404,
-        'message': 'Not Found: ' + request.path,
-    }
-    resp = jsonify(message)
-    resp.status_code = 404
-
-    return resp
+    url = urljoin(db.proxyurl(), request.path) 
+    try:
+        req = requests.request(
+            request.method,
+            url,
+            data=request.data,
+            headers=request.headers,
+            stream=True)
+    except Exception as e:
+        return "404 or could not reach proxy server. Exception: {}".format(e), 404 
+        
+    return Response(
+            stream_with_context(req.iter_content()),
+            content_type=req.headers['content-type'])
     
 
 def addapi(api):
@@ -74,10 +85,17 @@ def updatejockle(id, url, method, type, returndata, returncode):
     return redirect("/")
 
 
+@app.route("/updatejockleproxy", methods=["POST"])
+@requireformdata(["proxyurl"])
+def updateproxy(proxyurl):
+    db.setproxyurl(proxyurl)
+    return redirect("/")
+
+
 @app.route("/")
 def index():
     apis = db.listpaths()
-    return render_template("index.html", apis=apis, mimes=mimes, statuscodes=statuscodes), 200
+    return render_template("index.html", apis=apis, mimes=mimes, statuscodes=statuscodes, proxyurl=db.proxyurl()), 200
 
 
 def main():

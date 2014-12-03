@@ -211,6 +211,22 @@ $(document).ready(function() {
 				</div>
 			</div>
 		</form>
+		<hr/>
+
+		<form action="/updatejockleproxy" method="POST">
+			<div class="row"> 
+				<h2> Proxy settings.</h2>
+				<p>Every unknown path will be redirected to this url. Please write it as http://....:5000/ </p>
+				<div class="form-group">
+					<div class="col-xs-5">
+						<input class="form-control" type="text" name="proxyurl" value="{{ proxyurl }}"/>
+						<br/>
+						<input class="form-submit" type="submit"  value="Update proxy"/>
+					</div>
+
+				</div>
+			</div>
+		</form>
 
 	</div>
 

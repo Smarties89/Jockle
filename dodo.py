@@ -1,6 +1,6 @@
 #!/bin/python
 import os
-def task_depedencyinstaller():
+def task_installdepedencies():
     return {
         'actions': ["bash installs"],
         'file_dep': ["installs"],

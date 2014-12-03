@@ -21,13 +21,16 @@ class RouteDatabaseShelve:
         s = shelve.open(fn)
         if not "l" in s:
             self.l = []
+            self._proxy = {"url": ""}
         else:
             self.l = s['l']
+            self._proxy = s['proxy']
         s.close()
 
     def __savestate(self):
         f = shelve.open(self.fn)
         f['l'] = self.l
+        f['proxy'] = self._proxy
         f.close()
 
     def insertroute(self, url, method, type, returndata, returncode):
@@ -55,3 +58,11 @@ class RouteDatabaseShelve:
         i[0]['returncode'] = returncode
 
         self.__savestate()
+    
+    def proxyurl(self):
+        return self._proxy['url']
+
+    def setproxyurl(self, url):
+        self._proxy['url'] = url
+        self.__savestate()
+
