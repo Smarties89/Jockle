@@ -77,10 +77,14 @@ $(document).ready(function() {
 					</div>
 					<div class="col-xs-1">
 						<select class="form-control" name="method">
-							<option value="GET">GET</option>
-							<option value="POST">POST</option>
-							<option value="PUT">PUT</option>
-							<option value="DELETE">DELETE</option>
+							{% for method in ["GET", "POST", "PUT", "DELETE"] %}
+								{% if method == api['method'] %}
+									<option value="{{method}}" selected="selected">{{method}}</option>
+								{% else %}
+									<option value="{{method}}">{{method}}</option>
+								{% endif %}
+							{% endfor %} 
+
 						</select>
 					</div>
 					<div class="col-xs-3">
@@ -98,7 +102,7 @@ $(document).ready(function() {
 					<div class="col-xs-2">
 						<select class="form-control" name="returncode">	
 						{% for statuscode in statuscodes %}
-							{% if statuscode[0] == 200 %}
+							{% if statuscode[0] == api['returncode'] %}
 								<option value="{{ statuscode[0] }}" selected>{{ statuscode[1] }}({{ statuscode[0] }})</option>
 							{% else %}
 								<option value="{{ statuscode[0] }}">{{ statuscode[1] }}({{ statuscode[0] }})</option>
@@ -118,7 +122,7 @@ $(document).ready(function() {
 
 					<div class="col-xs-3">
 						<p><b> Return</b></p>
-						<textarea class="form-control expand" rows="1" name="returndata" cols="10">{{ api['data']|e }}</textarea>
+						<textarea class="form-control expand" rows="1" name="returndata" cols="10">{{ api['returndata'] }}</textarea>
 					</div>
 					
 					<div class="col-xs-4">

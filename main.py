@@ -3,27 +3,16 @@
 # Standard libraries
 import logging
 from sys import argv
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
-from jinja2 import Environment, FileSystemLoader
-from cgi import parse_header, parse_multipart
-from urlparse import parse_qs
+from flask import render_template, Flask, request, redirect, jsonify
+from fest.decorators import requireformdata
 
 from statuscodes import statuscodes
 from mimes import mimes
 from dbs import RouteDatabaseShelve 
 
 log = logging.getLogger()
-
-dbpath = argv[1]
-port = int(argv[2])
-
-env = Environment(loader=FileSystemLoader('templates'))
-
-
-def render_template(templatefile, **kwargs):
-    template = env.get_template(templatefile)
-    return template.render(**kwargs)
+app = Flask(__name__)
 
 
 def debug():
@@ -39,98 +28,71 @@ else:
     log.setLevel(logging.INFO)
 
 
-db = RouteDatabaseShelve(dbpath)
-#db.insertroute("/cards/[\w]*/categories", "POST", "json", '{"status": "hi"}')
+@app.errorhandler(404)
+def not_found(error=None):
+
+    message = {
+        'status': 404,
+        'message': 'Not Found: ' + request.path,
+    }
+    resp = jsonify(message)
+    resp.status_code = 404
+
+    return resp
+    
+
+def addapi(api):
+    log.info("Adding '{}' as api".format(api['url']))
+    app.add_url_rule(
+        api['url'], # path
+        api['url'], # name
+        lambda: api['returndata'],
+        methods=[api['method']])
+        
 
 
-class MBaseRequestHandler(BaseHTTPRequestHandler):
-    def ret(self, text, type, returncode):
-        self.send_response(returncode)
-        self.send_header('Content-type', type)
-        self.end_headers()
-        self.wfile.write(text)
 
-    def do_GET(self):
-        res, type, returncode = self.get(self.path, {})
-        self.ret(res, type, returncode)
-
-    def do_POST(self):
-        vars = self.parse_POST()
-        log.debug(vars)
-        res, type, returncode = self.post(self.path, vars)
-
-        self.ret(res, type, returncode)
-
-    def parse_POST(self):
-        ctype, pdict = parse_header(self.headers['content-type'])
-        if ctype == 'multipart/form-data':
-            postvars = parse_multipart(self.rfile, pdict)
-        elif ctype == 'application/x-www-form-urlencoded':
-            length = int(self.headers['content-length'])
-            postvars = parse_qs(
-                self.rfile.read(length),
-                keep_blank_values=1)
-        else:
-            postvars = {}
-        return postvars
+@app.route("/insertjockle", methods=["POST"])
+@requireformdata(["url", "method", "type", "returndata", "returncode"])
+def insertjockle(url, method, type, returndata, returncode):
+    db.insertroute(url, method, type, returndata, returncode)
+    return redirect("/")
 
 
-class DummyHandler(MBaseRequestHandler):
+@app.route("/updatejockle", methods=["POST"])
+@requireformdata(["id", "url", "method", "type", "returndata", "returncode"])
+def updatejockle(id, url, method, type, returndata, returncode):
+    db.update(
+        id,
+        url,
+        method,
+        type,
+        returndata,
+        int(returncode))
+    return redirect("/")
 
-    def post(self, url, vars):
-        if url == "/updatejockle":
-            return self.update(url, vars)
-        elif url == "/insertjockle":
-            self.insert(vars)
-            return self.index(), "text/html", 200
 
-        data = db.searchurlpattern(self.path, "POST")
-
-        if data is None:
-            return "Doesn't exists!", "text/html", 200
-
-        return data['returndata'], data['type'], data['returncode']
-
-    def get(self, url, vars):
-        if url == "/":
-            return self.index()
-        data = db.searchurlpattern(self.path, "GET")
-
-        if data is None:
-            return "Doesn't exists!", "text/html", 200
-
-        return data['returndata'], data['type'], data['returncode']
-
-    def insert(self, vars):
-        log.debug(vars)
-        url = vars['url'][0]
-        method = vars['method'][0]
-        type = vars['type'][0]
-        returndata = vars['returndata'][0]
-        returncode = int(vars['returncode'][0])
-        db.insertroute(url, method, type, returndata, returncode)
-
-    def index(self):
-        log.debug("Index requested")
-
-        apis = db.listpaths()
-        return render_template("index.html", apis=apis, mimes=mimes, statuscodes=statuscodes), "text/html", 200
-
-    def update(self, url, vars):
-        log.debug(vars)
-        db.update(
-            vars['id'][0],
-            vars['url'][0],
-            vars['method'][0],
-            vars['type'][0],
-            int(vars['returndata'][0]),
-            vars['returncode'][0])
-        return self.index()
+@app.route("/")
+def index():
+    apis = db.listpaths()
+    return render_template("index.html", apis=apis, mimes=mimes, statuscodes=statuscodes), 200
 
 
 def main():
-    server = HTTPServer(('', port), DummyHandler)
-    server.serve_forever()
+    try:
+        dbpath = argv[1]
+        port = int(argv[2])
+    except:
+        print("Wrong arguments. Please use python jockle.py <dbpath> <port>\n<dbpath> is the database file and <port> is the port to run the server on")
+        return
+
+    global db
+    db = RouteDatabaseShelve(dbpath)
+
+    for api in db.listpaths():
+        addapi(api)
+    app.debug = True
+    app.run(host="0.0.0.0", port=port, extra_files=["dummytestdata.db"])
 
 
 if __name__ == "__main__":
