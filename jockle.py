@@ -31,22 +31,37 @@ else:
     logging.basicConfig()
     log.setLevel(logging.INFO)
 
+def translateheaders(header):
+    res = {}
+    for r in header.keys():
+        res[r] = header[r]
+
+
+    return res
+
 # This is handling the proxy functionality.
 # Thanks to Zeray Rice for the stream proxy,
 # see more here: http://flask.pocoo.org/snippets/118/
 @app.errorhandler(404)
 def not_found(error=None):
     url = urljoin(db.proxyurl(), request.path) 
+
+    headers = translateheaders(request.headers)
+    headers['Host'] = db.proxyurl().strip("http://")
+    del headers["Content-Type"]
+    del headers["Content-Length"]
+    
     try:
         req = requests.request(
             request.method,
             url,
             data=request.data,
-            headers=request.headers,
+            headers=headers,
             stream=True)
     except Exception as e:
         return "404 or could not reach proxy server. Exception: {}".format(e), 404 
-        
+
+    log.info("Using proxy and serving '{}' with headers {}".format(url, headers))
     return Response(
             stream_with_context(req.iter_content()),
             content_type=req.headers['content-type'])
