@@ -3,10 +3,27 @@ Jockle
 
 Fake or proxy HTTP API's for fast prototyping of frontends or other services.
 
+Installation
+------------
+
+Jockle only have Flask as depedency. To install type following:
+```
+github clone git@github.com:Smarties89/Jockle.git
+# Either
+sudo apt-get install python-flask
+# Or sudo pip install flask
+```
+
+Now you can run jockle by typing
+```
+python jockle.py myapi.db 5000
+```
+This starts jockle on port 5000 with *myapi.db* as the place to save/load API's from. Now you can go to [http://127.0.0.1:5000/](http://127.0.0.1:5000/) and start defining your API. The API will be available on [http://127.0.0.1:5000/](http://127.0.0.1:5000/) too. 
+
 Current state of project
 ------------------------
 
-This is very useful in increasing frontend(and other API' users) productivity. However the project is still *beta mode*. It is built as a *need-to-have* tool, and is not *finished, polished or looking good*. Remark also that this is meant to be run in developer environments(not ever in production!), and therefore lot of good security practices have been avoided to decrease limitation of the developer.
+This is very useful in **increasing frontend(and other API' users) productivity**. However the project is still **beta mode**. It is built as a **need-to-have** tool, and is not **finished, polished or looking good**. Remark also that this is meant to be run in developer environments(not ever in production!), and therefore lot of good security practices have been avoided to decrease limitation of the developer.
 
 How you could benefit from it
 -----------------------------
@@ -15,6 +32,8 @@ Whenever you are building a web service from scratch or working with a existing 
 
 An Overview of the process can be seen here:
 ![alt tag](https://raw.githubusercontent.com/Smarties89/Jockle/master/docs/Jockle_overview.png)
+
+
 
 Highlights
 ----------
