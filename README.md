@@ -10,6 +10,9 @@ How you could benefit from it
 
 Whenever you are building a web service from scratch or working with a existing project, Jockle will help you out. With a new project you can specify API's and worry about implementing them later(or delegate that to a backend developer, who of course can use your Jockle as specification). When the project moves forward, and you want to use the implemented API when developing, you can use Jockle as a proxy to your implemented server, but still make use of new API's made with Jockle. In other words, Jockle tries to find an API first in the Jockle API list, and if that fails it will proxy the other server.
 
+An Overview of the process can be seen here:
+![alt tag](https://raw.githubusercontent.com/Smarties89/Jockle/master/docs/Jockle_overview.png)
+
 Highlights
 ==========
 
