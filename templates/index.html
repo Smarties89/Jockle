@@ -7,7 +7,7 @@
 <html>
 
  <head>
-	<title></title>
+	<title>Jockle - fake or proxy API calls</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,31 +41,7 @@ $(document).ready(function() {
  <body>
 
  	<div class="container">
-		<h1>API with the possibilty of changing</h1><br/><br/>
-
-<!--		<div class="row"> 
-			<div class="form-group">
-				<div class="col-xs-5">
-					<h3>Url</h3>
-				</div>
-				<div class="col-xs-1">
-					<h3>Method</h3>
-				</div>
-				<div class="col-xs-1">
-					<h3>Type</h3>
-				</div>
-				<div class="col-xs-1">
-					<h3>Link</h3>
-				</div>
-				<div class="col-xs-3">
-					<h3>Data</h3>
-				</div>
-				<div class="col-xs-1">
-					<h3>Save</h3>
-				</div>
-			</div>
-		</div>
--->
+		<h2>Api's</h2>
 		{% for api in apis %}
 		<hr/>
 		<form action="/updatejockle" method="POST">
@@ -213,20 +189,31 @@ $(document).ready(function() {
 		</form>
 		<hr/>
 
-		<form action="/updatejockleproxy" method="POST">
-			<div class="row"> 
-				<h2> Proxy settings.</h2>
-				<p>Every unknown path will be redirected to this url. Please write it as http://....:5000/ </p>
+
+		<div class="row"> 
+
+
+			<form action="/updatejockleproxy" method="POST">
 				<div class="form-group">
 					<div class="col-xs-5">
+						<h2> Proxy settings.</h2>
+						<p>Every unknown path will be redirected to this url. Please write it as http://....:5000/ </p>
 						<input class="form-control" type="text" name="proxyurl" value="{{ proxyurl }}"/>
 						<br/>
 						<input class="form-submit" type="submit"  value="Update proxy"/>
 					</div>
 
 				</div>
-			</div>
-		</form>
+			</form>
+				<div class="col-xs-5">
+					<h2> Exportplugins</h2>
+					<p>Every unknown path will be redirected to this url. Please write it as http://....:5000/ </p>
+					{% for plugin in exportplugins %}
+						<a href="/exportjockle?pluginnr={{ loop.index-1 }}">Export as {{ plugin.name }}</a>
+					{% endfor %}
+				</div>
+		</div>
+
 
 	</div>
 

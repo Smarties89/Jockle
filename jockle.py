@@ -4,15 +4,17 @@
 import logging
 from sys import argv
 from urlparse import urljoin
+from zipfile import ZipFile
 
-from flask import render_template, Flask, request, redirect, jsonify, Response
+from flask import render_template, Flask, request, redirect, Response
 from fest.decorators import requireformdata
 from flask import stream_with_context
 import requests
 
 from statuscodes import statuscodes
 from mimes import mimes
-from dbs import RouteDatabaseShelve 
+from dbs import RouteDatabaseShelve
+import exportplugins
 
 
 log = logging.getLogger()
@@ -31,6 +33,7 @@ else:
     logging.basicConfig()
     log.setLevel(logging.INFO)
 
+
 def translateheaders(header):
     res = {}
     for r in header.keys():
@@ -39,18 +42,19 @@ def translateheaders(header):
 
     return res
 
+
 # This is handling the proxy functionality.
 # Thanks to Zeray Rice for the stream proxy,
 # see more here: http://flask.pocoo.org/snippets/118/
 @app.errorhandler(404)
 def not_found(error=None):
-    url = urljoin(db.proxyurl(), request.path) 
+    url = urljoin(db.proxyurl(), request.path)
 
     headers = translateheaders(request.headers)
     headers['Host'] = db.proxyurl().strip("http://")
     del headers["Content-Type"]
     del headers["Content-Length"]
-    
+
     try:
         req = requests.request(
             request.method,
@@ -65,14 +69,14 @@ def not_found(error=None):
     return Response(
             stream_with_context(req.iter_content()),
             content_type=req.headers['content-type'])
-    
+ 
 
 def addapi(api):
     log.info("Adding '{}' as api".format(api['url']))
     try:
         app.add_url_rule(
-            api['url'], # path
-            api['url'], # name
+            api['url'],  # path
+            api['url'],  # name
             lambda: Response(api['returndata'], mimetype=api['type']),
             methods=[api['method']])
     except Exception as e:
@@ -107,13 +111,36 @@ def updateproxy(proxyurl):
     return redirect("/")
 
 
+@app.route("/exportjockle")
+def useexportplugin():
+    pluginnr = int(request.args['pluginnr'])
+    e = exportplugins.plugins[pluginnr]("some name")
+    for api in db.listpaths():
+        e.addapi(api)
+    z = ZipFile("static/exported.zip", "w")
+    for f in e.export():
+        # Makes a new file called name.
+        z.writestr(f['filename'], f['data'])
+    z.close()
+    return app.send_static_file("exported.zip")
+
+
+
 @app.route("/")
 def index():
     apis = db.listpaths()
-    return render_template("index.html", apis=apis, mimes=mimes, statuscodes=statuscodes, proxyurl=db.proxyurl()), 200
+    return render_template(
+        "index.html",
+        apis=apis,
+        mimes=mimes,
+        statuscodes=statuscodes,
+        proxyurl=db.proxyurl(),
+        exportplugins=exportplugins.plugins
+        ), 200
 
 
 def main():
+    global dbpath
     try:
         dbpath = argv[1]
         port = int(argv[2])
@@ -122,6 +149,7 @@ def main():
         return
 
     global db
+
     db = RouteDatabaseShelve(dbpath)
 
     for api in db.listpaths():

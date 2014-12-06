@@ -3,15 +3,15 @@
 # Standard libraries
 import logging
 import shelve
-import re
 from uuid import uuid1
+
 
 # Third party libraries
 
 # My libraries
 
-log = logging.getLogger()
 
+log = logging.getLogger()
 
 
 class RouteDatabaseShelve:
@@ -48,7 +48,7 @@ class RouteDatabaseShelve:
     def listpaths(self):
         return self.l
 
-    def update(self, id, url, method, type,returndata, returncode):
+    def update(self, id, url, method, type, returndata, returncode):
         i = filter(lambda o: o['id'] == id, self.l)
 
         i[0]['url'] = url
@@ -58,11 +58,10 @@ class RouteDatabaseShelve:
         i[0]['returncode'] = returncode
 
         self.__savestate()
-    
+
     def proxyurl(self):
         return self._proxy['url']
 
     def setproxyurl(self, url):
         self._proxy['url'] = url
         self.__savestate()
-
