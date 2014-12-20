@@ -1,5 +1,6 @@
 #!/bin/python
-import os
+
+
 def task_installdepedencies():
     return {
         'actions': ["bash installs"],
@@ -7,8 +8,9 @@ def task_installdepedencies():
         'verbosity': 2
     }
 
-def task_rundebug():
+
+def task_builddocker():
     return {
-        "actions": ["python jockle.py dummytestdata.db 5000", ],
+        "actions": ["sudo docker build -t jockle ."],
         "verbosity": 2
     }

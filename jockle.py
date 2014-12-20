@@ -16,7 +16,6 @@ from mimes import mimes
 from dbs import RouteDatabaseShelve
 import exportplugins
 
-
 log = logging.getLogger()
 app = Flask(__name__)
 
