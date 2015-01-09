@@ -7,7 +7,7 @@
 <html>
 
  <head>
-	<title>Jockle - fake or proxy API calls</title>
+	<title>Jockle - fake or proxy HTTP API request</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,7 +33,7 @@ $(document).ready(function() {
  <style>
 .expand {
 	height: 1em;
-	width: 50%;
+	width: 90%;
 	padding: 3px;
 }
  </style>
@@ -41,28 +41,17 @@ $(document).ready(function() {
  <body>
 
  	<div class="container">
-		<h2>Api's</h2>
+		<h2>API</h2>
 		{% for api in apis %}
 		<hr/>
 		<form action="/updatejockle" method="POST">
 			<div class="row"> 
 				<div class="form-group">
 					<input type="hidden" name="id" value="{{ api['id'] }}" />
-					<div class="col-xs-5">
+					<div class="col-xs-4">
 						<input class="form-control" type="text" name="url" value="{{ api['url'] }}"/>
 					</div>
-					<div class="col-xs-1">
-						<select class="form-control" name="method">
-							{% for method in ["GET", "POST", "PUT", "DELETE"] %}
-								{% if method == api['method'] %}
-									<option value="{{method}}" selected="selected">{{method}}</option>
-								{% else %}
-									<option value="{{method}}">{{method}}</option>
-								{% endif %}
-							{% endfor %} 
 
-						</select>
-					</div>
 					<div class="col-xs-3">
 						<select class="form-control" name="type" value="{{ api['type'] }}">
 							{% for mime in mimes %}
@@ -72,10 +61,7 @@ $(document).ready(function() {
 									<option value="{{mime}}">{{mime}}</option>
 								{% endif %}
 							{% endfor %}
-						</select>
-					</div>
-					
-					<div class="col-xs-2">
+						</select><br/>
 						<select class="form-control" name="returncode">	
 						{% for statuscode in statuscodes %}
 							{% if statuscode[0] == api['returncode'] %}
@@ -87,33 +73,26 @@ $(document).ready(function() {
 						</select>
 					</div>
 
-					<div class="col-xs-1">
-						<a href="{{ api['url'] }}"> link</a>
-					</div>
-				</div>
-			</div>
-			<br/>
-			<div class="row"> 
-				<div class="form-group">
 
 					<div class="col-xs-3">
-						<p><b> Return</b></p>
-						<textarea class="form-control expand" rows="1" name="returndata" cols="10">{{ api['returndata'] }}</textarea>
+						<textarea placeholder="Return data" class="form-control expand" rows="1" name="returndata" cols="20">{{ api['returndata'] }}</textarea>
 					</div>
 					
-					<div class="col-xs-4">
-						<p><b> Input arguments(JSON)</b></p>
-						{% for arg in api['args'] %}
-							<input class="form-control" type="text" name="args" value="{{ arg[0] }}"/>
-						{% endfor %}
-					</div>
+					<div class="col-xs-2">
+						<select class="form-control" name="method">
+							{% for method in ["GET", "POST", "PUT", "DELETE"] %}
+								{% if method == api['method'] %}
+									<option value="{{method}}" selected="selected">{{method}}</option>
+								{% else %}
+									<option value="{{method}}">{{method}}</option>
+								{% endif %}
+							{% endfor %} 
 
-
-					<div class="col-xs-offset-4 col-xs-1">
-						<br/><br/>
+						</select> <br/>
+						<a href="{{ api['url'] }}"> link</a>
+						<a href="jockledelete/{{ api['url'] }}"> delete</a>
 						<input class="form-submit" type="submit"  value="Save"/>
 					</div>
-
 				</div>
 			</div>
 		</form>
@@ -134,7 +113,7 @@ $(document).ready(function() {
 			<div class="row"> 
 				<div class="form-group">
 					<div class="col-xs-5">
-						<input class="form-control" type="text" name="url"/>
+						<input  placeholder="Url" class="form-control" type="text" name="url"/>
 					</div>
 					<div class="col-xs-2">
 						<select class="form-control" name="method">
@@ -174,8 +153,7 @@ $(document).ready(function() {
 				<div class="form-group">
 
 					<div class="col-xs-3">
-						<p><b> Return</b></p>
-						<textarea class="form-control expand" rows="1" name="returndata" cols="10"></textarea>
+						<textarea  placeholder="Return data" class="form-control expand" rows="1" name="returndata" cols="10"></textarea>
 					</div>
 
 
@@ -187,7 +165,7 @@ $(document).ready(function() {
 				</div>
 			</div>
 		</form>
-		<hr/>
+		<hr/> <hr/>
 
 
 		<div class="row"> 
