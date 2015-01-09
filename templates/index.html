@@ -152,12 +152,12 @@ $(document).ready(function() {
 			<div class="row"> 
 				<div class="form-group">
 
-					<div class="col-xs-3">
-						<textarea  placeholder="Return data" class="form-control expand" rows="1" name="returndata" cols="10"></textarea>
+					<div class="col-xs-11">
+						<textarea  placeholder="Return data" class="form-control input-xlarge" row="20" cols="20" name="returndata"></textarea>
 					</div>
 
 
-					<div class="col-xs-offset-8 col-xs-1">
+					<div class="col-xs-1">
 						<br/><br/>
 						<input class="form-submit" type="submit"  value="Insert"/>
 					</div>
@@ -175,7 +175,7 @@ $(document).ready(function() {
 				<div class="form-group">
 					<div class="col-xs-5">
 						<h2> Proxy settings.</h2>
-						<p>Every unknown path will be redirected to this url. Please write it as http://....:5000/ </p>
+						<p>Every unknown path will be redirected to this url. Please write it as http://....:PORTNR/ or https://...:PORTNR/. <b>Remark</b> that the url has to be specified with the exact protocol and with or without www depending on the host. E.g. for proxying github only https://github.com will work, and http://github.com or https://www.github.com will not work. </p>
 						<input class="form-control" type="text" name="proxyurl" value="{{ proxyurl }}"/>
 						<br/>
 						<input class="form-submit" type="submit"  value="Update proxy"/>

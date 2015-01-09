@@ -8,7 +8,6 @@ from zipfile import ZipFile
 
 from flask import render_template, Flask, request, redirect, Response
 from fest.decorators import requireformdata
-from flask import stream_with_context
 import requests
 
 from statuscodes import statuscodes
@@ -36,8 +35,7 @@ else:
 def translateheaders(header):
     res = {}
     for r in header.keys():
-        res[r] = header[r]
-
+        res[r] = header[r].encode("ASCII")
 
     return res
 
@@ -47,27 +45,30 @@ def translateheaders(header):
 # see more here: http://flask.pocoo.org/snippets/118/
 @app.errorhandler(404)
 def not_found(error=None):
-    url = urljoin(db.proxyurl(), request.path)
+    url = urljoin(db.proxyurl(), request.path).encode("ASCII")
 
     headers = translateheaders(request.headers)
-    headers['Host'] = db.proxyurl().strip("http://")
+    headers['Host'] = db.proxyurl().lstrip("http://").lstrip("https://").rstrip("/").encode("ASCII")
+
     del headers["Content-Type"]
     del headers["Content-Length"]
 
     try:
+        log.info("Requesting {} [{}] data: '{}'".format(url, request.method, request.data))
+        print("headers")
+        for h in headers:
+            print(" - '{}':'{}'".format(h, headers[h]))
+
         req = requests.request(
             request.method,
             url,
             data=request.data,
-            headers=headers,
-            stream=True)
+            allow_redirects=False,
+            headers=headers)
+
+        return req.content
     except Exception as e:
         return "404 or could not reach proxy server. Exception: {}".format(e), 404 
-
-    log.info("Using proxy and serving '{}' with headers {}".format(url, headers))
-    return Response(
-            stream_with_context(req.iter_content()),
-            content_type=req.headers['content-type'])
  
 
 def addapi(api):
@@ -87,7 +88,7 @@ def addapi(api):
 @requireformdata(["url", "method", "type", "returndata", "returncode"])
 def insertjockle(url, method, type, returndata, returncode):
     db.insertroute(url, method, type, returndata, returncode)
-    return redirect("/")
+    return redirect("/jockle")
 
 
 @app.route("/updatejockle", methods=["POST"])
@@ -100,14 +101,14 @@ def updatejockle(id, url, method, type, returndata, returncode):
         type,
         returndata,
         int(returncode))
-    return redirect("/")
+    return redirect("/jockle")
 
 
 @app.route("/updatejockleproxy", methods=["POST"])
 @requireformdata(["proxyurl"])
 def updateproxy(proxyurl):
     db.setproxyurl(proxyurl)
-    return redirect("/")
+    return redirect("/jockle")
 
 
 @app.route("/exportjockle")
@@ -125,7 +126,7 @@ def useexportplugin():
 
 
 
-@app.route("/")
+@app.route("/jockle")
 def index():
     apis = db.listpaths()
     return render_template(
