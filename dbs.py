@@ -65,3 +65,7 @@ class RouteDatabaseShelve:
     def setproxyurl(self, url):
         self._proxy['url'] = url
         self.__savestate()
+
+    def delete(self, url):
+        self.l = filter(lambda o: o['url'] != url, self.l)
+        self.__savestate()

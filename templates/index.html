@@ -90,7 +90,7 @@ $(document).ready(function() {
 
 						</select> <br/>
 						<a href="{{ api['url'] }}"> link</a>
-						<a href="jockledelete/{{ api['url'] }}"> delete</a>
+						<a href="jockledelete?url={{ api['url']|e }}"> delete</a>
 						<input class="form-submit" type="submit"  value="Save"/>
 					</div>
 				</div>

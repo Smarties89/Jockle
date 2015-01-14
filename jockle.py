@@ -139,6 +139,15 @@ def index():
         ), 200
 
 
+@app.route("/jockledelete")
+def jockledelete():
+    url = request.args.get("url")
+    log.info("Deleting {}".format(url))
+    db.delete(url)
+    return redirect("/jockle")
+
+
+
 def main():
     global dbpath
     try:
