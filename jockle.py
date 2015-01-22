@@ -32,10 +32,10 @@ else:
     log.setLevel(logging.INFO)
 
 
-################################################
-########### API for controlling jockle. ########
-################################################
- 
+#################################################
+###########  API for controlling jockle. ########
+#################################################
+
 
 def addapi(api):
     log.info("Adding '{}' as api".format(api['url']))
@@ -119,7 +119,7 @@ def jockledelete():
 def translateheaders(header):
     res = {}
     for r in header.keys():
-        res[r] = header[r] # .encode("ASCII")
+        res[r] = header[r]  # .encode("ASCII")
 
     return res
 
