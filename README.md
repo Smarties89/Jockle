@@ -3,8 +3,8 @@ Jockle
 
 Fake or proxy HTTP API's for fast prototyping of frontends or other services.
 
-Installation
-------------
+How to
+------
 
 Jockle only have Flask as depedency. To install type following:
 ```
@@ -18,7 +18,7 @@ Now you can run jockle by typing
 ```
 python jockle.py myapi.db 5000
 ```
-This starts jockle on port 5000 with *myapi.db* as the place to save/load API's from. Now you can go to [http://127.0.0.1:5000/](http://127.0.0.1:5000/) and start defining your API. The API will be available on [http://127.0.0.1:5000/](http://127.0.0.1:5000/) too. 
+This starts jockle on port 5000 with *myapi.db* as the place to save/load API's from. Now you can go to http://127.0.0.1:5000/jockle and start defining your API. The API will be available on http://127.0.0.1:5000/ too. 
 
 Current state of project
 ------------------------
