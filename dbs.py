@@ -4,6 +4,7 @@
 import logging
 import shelve
 from uuid import uuid1
+from json import load, dumps
 
 
 # Third party libraries
@@ -32,6 +33,68 @@ class RouteDatabaseShelve:
         f['l'] = self.l
         f['proxy'] = self._proxy
         f.close()
+
+    def insertroute(self, url, method, type, returndata, returncode):
+        self.l.append(
+            {
+                "url": url,
+                "method": method,
+                "type": type,
+                "returndata": returndata,
+                "returncode": returncode,
+                "id": str(uuid1())
+            })
+        self.__savestate()
+
+    def listpaths(self):
+        return self.l
+
+    def update(self, id, url, method, type, returndata, returncode):
+        i = filter(lambda o: o['id'] == id, self.l)
+
+        i[0]['url'] = url
+        i[0]['method'] = method
+        i[0]['type'] = type
+        i[0]['returndata'] = returndata
+        i[0]['returncode'] = returncode
+
+        self.__savestate()
+
+    def proxyurl(self):
+        return self._proxy['url']
+
+    def setproxyurl(self, url):
+        self._proxy['url'] = url
+        self.__savestate()
+
+    def delete(self, url):
+        self.l = filter(lambda o: o['url'] != url, self.l)
+        self.__savestate()
+
+
+class RouteDatabaseJSON:
+    def __init__(self, fn):
+        self.fn = fn
+
+        with open(fn) as f:
+            s = load(f)
+            if "l" not in s:
+                self.l = []
+                self._proxy = {"url": ""}
+            else:
+                self.l = s['l']
+                self._proxy = s['proxy']
+
+    def __savestate(self):
+        with open(self.fn, "w") as f:
+            text = dumps(
+                {
+                    "l": self.l,
+                    "proxy": self._proxy
+                },
+                sort_keys=True,
+                indent=4)
+            f.write(text)
 
     def insertroute(self, url, method, type, returndata, returncode):
         self.l.append(

@@ -12,7 +12,7 @@ import requests
 
 from statuscodes import statuscodes
 from mimes import mimes
-from dbs import RouteDatabaseShelve
+from dbs import RouteDatabaseJSON
 import exportplugins
 
 log = logging.getLogger("jockle")
@@ -288,7 +288,7 @@ def main():
 
     global db
 
-    db = RouteDatabaseShelve(dbpath)
+    db = RouteDatabaseJSON(dbpath)
 
     for api in db.listpaths():
         addapi(api)
