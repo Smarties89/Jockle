@@ -193,6 +193,7 @@ def externalcall(url):
     """
         This does the actual proxy call and returns the response
     """
+
     
     headers = translateheaders(request.headers)
     headers['Host'] = gethostforproxy()

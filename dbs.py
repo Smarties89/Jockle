@@ -4,7 +4,8 @@
 import logging
 import shelve
 from uuid import uuid1
-from json import load, dumps
+from json import loads, dumps
+from os.path import isfile
 
 
 # Third party libraries
@@ -12,7 +13,7 @@ from json import load, dumps
 # My libraries
 
 
-log = logging.getLogger()
+log = logging.getLogger("jockle")
 
 
 class RouteDatabaseShelve:
@@ -76,28 +77,41 @@ class RouteDatabaseJSON:
     def __init__(self, fn):
         self.fn = fn
 
-        with open(fn) as f:
-            s = load(f)
-            if "l" not in s:
-                self.l = []
-                self._proxy = {"url": ""}
-            else:
-                self.l = s['l']
-                self._proxy = s['proxy']
+        if not isfile(fn):
+            with open(fn, "w") as f:
+                f.write(dumps(
+                    {
+                        "proxyurl": "",
+                        "api": []
+                    }))
+        self.__loadstate()
+
+    def __loadstate(self):
+        with open(self.fn, "r") as f:
+            s = loads(f.read())
+            self._api = s['api']
+            self._proxy = s['proxyurl']
 
     def __savestate(self):
         with open(self.fn, "w") as f:
             text = dumps(
                 {
-                    "l": self.l,
-                    "proxy": self._proxy
+                    "api": self._api,
+                    "proxyurl": self._proxy
                 },
                 sort_keys=True,
                 indent=4)
             f.write(text)
 
     def insertroute(self, url, method, type, returndata, returncode):
-        self.l.append(
+        log.info("""Inserting route:
+\turl: {}
+\tmethod: {}
+\ttype: {}
+\treturndata: {}
+\treturncode: {}
+""".format(url, method, type, returndata, returncode))
+        self._api.append(
             {
                 "url": url,
                 "method": method,
@@ -109,10 +123,10 @@ class RouteDatabaseJSON:
         self.__savestate()
 
     def listpaths(self):
-        return self.l
+        return self._api
 
     def update(self, id, url, method, type, returndata, returncode):
-        i = filter(lambda o: o['id'] == id, self.l)
+        i = filter(lambda o: o['id'] == id, self._api)
 
         i[0]['url'] = url
         i[0]['method'] = method
@@ -123,12 +137,12 @@ class RouteDatabaseJSON:
         self.__savestate()
 
     def proxyurl(self):
-        return self._proxy['url']
+        return self._proxy
 
     def setproxyurl(self, url):
-        self._proxy['url'] = url
+        self._proxy = url
         self.__savestate()
 
     def delete(self, url):
-        self.l = filter(lambda o: o['url'] != url, self.l)
+        self._api = filter(lambda o: o['url'] != url, self._api)
         self.__savestate()
