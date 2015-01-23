@@ -116,6 +116,24 @@ def jockledelete():
 ########### API for proxying calls. ############
 ################################################
 
+
+# This is handling the proxy functionality.
+@app.errorhandler(404)
+def not_found(error=None):
+    try:
+        url = urljoin(db.proxyurl(), request.path) # .encode("ASCII")
+        log.info("Preparing proxy call to {}".format(url))
+        exres = externalcall(url)
+
+        log.debug("Creating the response")
+        resp = create_response(exres)
+
+        log.debug("Response created. Now returning it")
+        return resp # exres.content # resp
+    except Exception as e:
+        return "404 or could not reach proxy server. Exception: {}".format(e), 404 
+
+
 def translateheaders(header):
     res = {}
     for r in header.keys():
@@ -202,7 +220,7 @@ def externalcall(url):
     # TODO: look at http://docs.python-requests.org/en/latest/api/#requests.Response to see what to transfer.
 
     # Why have this ever been here?
-    del headers["Content-Type"]
+    #del headers["Content-Type"]
 
     # TODO: Set referer
     #  Referer: http://127.0.0.1:5006/translator/translate.html
@@ -217,6 +235,7 @@ def externalcall(url):
         log.debug("externalcall: \t- '{}':'{}'".format(h, headers[h]))
 
     log.info("externalcall: requesting {} [{}] data: '{}'".format(url, request.method, request.data))
+    print(request.environ['body_copy'])
     exres = requests.request(
         request.method,
         url,
@@ -225,23 +244,6 @@ def externalcall(url):
         headers=headers)
 
     return exres
-
-
-# This is handling the proxy functionality.
-@app.errorhandler(404)
-def not_found(error=None):
-    try:
-        url = urljoin(db.proxyurl(), request.path) # .encode("ASCII")
-        log.info("Preparing proxy call to {}".format(url))
-        exres = externalcall(url)
-
-        log.debug("Creating the response")
-        resp = create_response(exres)
-
-        log.debug("Response created. Now returning it")
-        return resp # exres.content # resp
-    except Exception as e:
-        return "404 or could not reach proxy server. Exception: {}".format(e), 404 
 
 
 # Thanks to jhasi at stackoverflow
