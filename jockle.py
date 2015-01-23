@@ -134,13 +134,6 @@ def not_found(error=None):
         return "404 or could not reach proxy server. Exception: {}".format(e), 404 
 
 
-def translateheaders(header):
-    res = {}
-    for r in header.keys():
-        res[r] = header[r]  # .encode("ASCII")
-
-    return res
-
 
 def create_response(exres):
     resp = make_response(exres.content)
@@ -193,8 +186,8 @@ def create_response(exres):
 
 def gethostforproxy():
     """
-        Takes the proxy url and strips it so it will work as header
-        in the reuqest to the external service.
+        Takes the proxy url and strips it so it will work as "host"
+        in the request header sent to the external service.
     """
     host = db.proxyurl()
     if host.startswith("https://"):
@@ -211,31 +204,26 @@ def externalcall(url):
     """
         This does the actual proxy call and returns the response
     """
-
     
-    headers = translateheaders(request.headers)
+    # The request.headers are a untypically format, and
+    # needs to transfered to a normal dict object, so that
+    # python-request can understand it.
+    headers = {}
+    for r in request.header.keys():
+        headers[r] = request.header[r]  # .encode("ASCII")
+
+    # We overwrite Host, so proxying will work more invisible.
     headers['Host'] = gethostforproxy()
-
     log.debug("externalcall: Original host: '{}' now host:'{}'".format(db.proxyurl(), headers['Host']))
-    # TODO: look at http://docs.python-requests.org/en/latest/api/#requests.Response to see what to transfer.
 
-    # Why have this ever been here?
-    #del headers["Content-Type"]
-
-    # TODO: Set referer
-    #  Referer: http://127.0.0.1:5006/translator/translate.html
-    #  Referer: http://sunday.zone/translator/translate.html
-
-
-    # This will python requset automatically add.
+    # python requset already automatically adds this.
     del headers["Content-Length"]
 
     log.debug("externalcall: headers for ")
     for h in headers:
         log.debug("externalcall: \t- '{}':'{}'".format(h, headers[h]))
 
-    log.info("externalcall: requesting {} [{}] data: '{}'".format(url, request.method, request.data))
-    print(request.environ['body_copy'])
+    log.info("externalcall: requesting {} [{}] data: '{}'".format(url, request.method, request.environ['body_copy']))
     exres = requests.request(
         request.method,
         url,
