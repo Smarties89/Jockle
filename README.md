@@ -51,7 +51,6 @@ Plan to implement
 * Make it possible to insert input variables.
 * API proxy grabber, that will record proxy and make it to API calls.
 * Exports for:
-
   * Client side stub
     * Python Request client.
     * Python urllib2 client.
