@@ -53,20 +53,22 @@ def addapi(api):
 @app.route("/insertjockle", methods=["POST"])
 @requireformdata(["url", "method", "type", "returndata", "returncode"])
 def insertjockle(url, method, type, returndata, returncode):
-    db.insertroute(url, method, type, returndata, returncode)
+    db.insertroute(url, method, type, returndata, returncode, "JSON", "")
     return redirect("/jockle")
 
 
 @app.route("/updatejockle", methods=["POST"])
-@requireformdata(["id", "url", "method", "type", "returndata", "returncode"])
-def updatejockle(id, url, method, type, returndata, returncode):
+@requireformdata(["id", "url", "method", "type", "returndata", "returncode", "inputtype", "inputvars"])
+def updatejockle(id, url, method, type, returndata, returncode, inputtype, inputvars):
     db.update(
         id,
         url,
         method,
         type,
         returndata,
-        int(returncode))
+        int(returncode),
+        inputtype,
+        inputvars)
     return redirect("/jockle")
 
 

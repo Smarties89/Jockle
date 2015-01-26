@@ -44,6 +44,7 @@ class RouteDatabaseShelve:
                 "returndata": returndata,
                 "returncode": returncode,
                 "id": str(uuid1())
+
             })
         self.__savestate()
 
@@ -103,14 +104,16 @@ class RouteDatabaseJSON:
                 indent=4)
             f.write(text)
 
-    def insertroute(self, url, method, type, returndata, returncode):
+    def insertroute(self, url, method, type, returndata, returncode, inputtype, inputvars):
         log.info("""Inserting route:
 \turl: {}
 \tmethod: {}
 \ttype: {}
 \treturndata: {}
 \treturncode: {}
-""".format(url, method, type, returndata, returncode))
+\tinputtype: {}
+\tinputvars: {}
+""".format(url, method, type, returndata, returncode, inputtype, inputvars))
         self._api.append(
             {
                 "url": url,
@@ -118,14 +121,16 @@ class RouteDatabaseJSON:
                 "type": type,
                 "returndata": returndata,
                 "returncode": returncode,
-                "id": str(uuid1())
+                "id": str(uuid1()),
+                "inputtype": inputtype,
+                "inputvars": inputvars
             })
         self.__savestate()
 
     def listpaths(self):
         return self._api
 
-    def update(self, id, url, method, type, returndata, returncode):
+    def update(self, id, url, method, type, returndata, returncode, inputtype, inputvars):
         i = filter(lambda o: o['id'] == id, self._api)
 
         i[0]['url'] = url
@@ -133,6 +138,8 @@ class RouteDatabaseJSON:
         i[0]['type'] = type
         i[0]['returndata'] = returndata
         i[0]['returncode'] = returncode
+        i[0]['inputtype'] = inputtype
+        i[0]['inputvars'] = inputvars
 
         self.__savestate()
 

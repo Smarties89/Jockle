@@ -73,9 +73,6 @@ $(document).ready(function() {
 
 
 					<div class="col-xs-3" style="border-right:1px black solid">
-						<textarea placeholder="Return data" class="form-control expand" rows="1" name="returndata" cols="20">{{ api['returndata'] }}</textarea>
-
-						<br/>
 						<select class="form-control" name="method">
 							{% for method in ["GET", "POST", "PUT", "DELETE"] %}
 								{% if method == api['method'] %}
@@ -86,23 +83,26 @@ $(document).ready(function() {
 							{% endfor %} 
 
 						</select> <br/>
+						<textarea placeholder="return data" class="form-control expand" rows="4" name="returndata" cols="20">{{ api['returndata'] }}</textarea>
+
+
 
 					</div>
-					<div class="col-xs-2">
+					<div class="col-xs-4">
 						<b>Input variables</b>
-						<select class="form-control" name="inputvariabletype">
-							<option value="JSON">JSON</option>
-							<option value="FORM">Form elements</option>
-							<option value="OTHER">Other</option>
-						</select><br/>
-					<input class="form-submit form-control" placeholder="Name" type="text"/><br/>
-					<input class="form-submit form-control" type="submit"  value="Add"/>
-					</div>
-					<div class="col-xs-2">
-						{% for ivar in inputvariables %}
 
-						
+						<select class="form-control" name="inputtype">
+						{% for inputtype in ["JSON", "FORM", "OTHER"] %}
+								{% if inputtype == api['inputtype'] %}
+									<option value="{{api['inputtype'] }}" selected="selected">{{api['inputtype'] }}</option>
+								{% else %}
+
+									<option value="{{ inputtype }}">{{ inputtype }}</option>
+								{% endif %}
 						{% endfor %}
+
+						</select><br/>
+						<textarea placeholder="" class="form-control" rows="4" name="inputvars" cols="40">{{ api['inputvars'] }}</textarea>
 					</div>
 				
 					<div class="col-xs-1">
