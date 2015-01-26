@@ -3,19 +3,20 @@ Jockle
 
 Fake or proxy HTTP API's for fast prototyping of frontends or other services.
 
-How to
+How to get started
 ------
 
-Jockle only have Flask as depedency. To install type following:
+Jockle only have Flask and python-requests as depedencies. To install type following:
 ```
 github clone git@github.com:Smarties89/Jockle.git
 # Either
-sudo apt-get install python-flask
-# Or sudo pip install flask
+sudo pip install flask requests
+# Or sudo apt-get install python-flask python-request
 ```
 
 Now you can run jockle by typing
 ```
+cd Jockle
 python jockle.py myapi.db 5000
 ```
 This starts jockle on port 5000 with *myapi.db* as the place to save/load API's from. Now you can go to http://127.0.0.1:5000/jockle and start defining your API. The API will be available on http://127.0.0.1:5000/ too. 
@@ -56,5 +57,4 @@ Plan to implement
     * Python urllib2 client.
     * CSharp client.
   * Specifications
-    * HTML output specification
     * LaTeX specification.
