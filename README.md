@@ -49,4 +49,12 @@ Plan to implement
 
 * Handling for Flask regular expressions(Right now you can't have API's with example <id> )
 * Make it possible to insert input variables.
-* Make a client-stub-maker for Python-Requests.
+* API proxy grabber, that will record proxy and make it to API calls.
+* Exports for:
+  * Client side stub
+    * Python Request client.
+    * Python urllib2 client.
+    * CSharp client.
+  * Specifications
+    * HTML output specification
+    * LaTeX specification.
