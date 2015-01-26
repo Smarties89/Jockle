@@ -205,7 +205,7 @@ $(document).ready(function() {
 					<h2> Exportplugins</h2>
 					<p>Every unknown path will be redirected to this url. Please write it as http://....:5000/ </p>
 					{% for plugin in exportplugins %}
-						<a href="/exportjockle?pluginnr={{ loop.index-1 }}">Export as {{ plugin.name }}</a>
+					<a href="/exportjockle?pluginnr={{ loop.index-1 }}">Export as {{ plugin.name }}</a><br/>
 					{% endfor %}
 				</div>
 		</div>

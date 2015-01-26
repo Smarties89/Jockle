@@ -1,0 +1,20 @@
+<table border="1">
+    <tr>
+        <th>URL</th>
+        <th>Method</th>
+        <th>Return type</th>
+        <th>Response code</th>
+        <th>Input variables</th>
+        <th>Example return</th>
+    </tr>
+    {% for api in apis %}
+        <tr>
+            <td>{{ api['url'] }}</td>
+            <td>{{ api['method'] }}</td>
+            <td>{{ api['type'] }}</td>
+            <td>{{ api['returncode'] }}</td>
+	    <td>{{ api['inputvars'] }}</td>
+	    <td>{{ api['returndata'] }} </td>
+        </tr>
+    {% endfor %}
+</table>

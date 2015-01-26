@@ -3,7 +3,9 @@
 
 # Import plugins
 import flaskserver
+import htmlexporter
 
 plugins = [
-    flaskserver.FlaskServerExporter
+    flaskserver.FlaskServerExporter,
+    htmlexporter.HTMLExporter
 ]
